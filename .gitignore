@@ -1,0 +1,16 @@
+# API keys
+Kaggle/
+
+# Datasets & Results
+data/
+results/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# macOS system files
+.DS_Store
