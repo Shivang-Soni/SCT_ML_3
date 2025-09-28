@@ -1,18 +1,42 @@
 import os
+import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-from utils import load_images_from_folder
 
+def load_images_from_folder(data_dir, target_size=(64, 64)):
+    X = []
+    y = []
+    classes = {"Cats": 0, "Dogs": 1}
+    for class_name, label in classes.items():
+        folder_path = data_dir / class_name
+        if not folder_path.exists():
+            raise FileNotFoundError(f"Ordner nicht gefunden: {folder_path}")
+        for filename in os.listdir(folder_path):
+            file_path = folder_path / filename
+            try:
+                img = cv2.imread(str(file_path))
+                if img is None:
+                    continue
+                img = cv2.resize(img, target_size)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # optional Graustufen
+                X.append(img.flatten())
+                y.append(label)
+            except Exception as e:
+                print(f"Error loading {file_path}: {e}")
+    return np.array(X), np.array(y)
 
 def execute():
-    # Paths
-    DATA_DIR = "../data/images"
-    RESULTS_DIR = "../results"
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    # Basedirectory
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    DATA_DIR = BASE_DIR / "data" / "raw"
+    RESULTS_DIR = BASE_DIR / "results"
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Load images
     X, y = load_images_from_folder(DATA_DIR, target_size=(64, 64))
@@ -54,5 +78,5 @@ def execute():
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
     plt.title("Confusion Matrix")
-    plt.savefig(os.path.join(RESULTS_DIR, "confusion_matrix.png"))
+    plt.savefig(RESULTS_DIR / "confusion_matrix.png")
     plt.show()

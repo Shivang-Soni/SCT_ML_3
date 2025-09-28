@@ -4,3 +4,5 @@ scikit-learn
 matplotlib 
 pillow 
 seaborn
+opencv-python
+scikit-image
